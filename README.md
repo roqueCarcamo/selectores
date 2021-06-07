@@ -1,2 +1,0 @@
-# selectores
-Selectores en angular
