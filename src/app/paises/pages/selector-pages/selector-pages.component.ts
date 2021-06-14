@@ -23,7 +23,7 @@ export class SelectorPagesComponent implements OnInit {
   //Llenar selectores
   regiones: string[] = [];
   paises: PaisSmall[] = [];
-  fronteras: string[] = [];
+  fronteras: PaisSmall[] = [];
 
   cargando: boolean = false;
 
@@ -58,22 +58,21 @@ export class SelectorPagesComponent implements OnInit {
         });
 
       // Cuando cambia el País 
-      this.miFormulario.get('pais')?.valueChanges
-        .pipe (
-          tap( _ => {
-            this.fronteras = [];
-            this.miFormulario.get('frontera')?.reset('');
-            this.cargando = true;
-          }),
-          switchMap ( pais => 
-            this.paisesService.getPaisPorCodigo( pais )
-          )
-        ).subscribe( pais => {
-          console.log(pais);
-          this.fronteras = pais?.borders || [];
-          this.cargando = false;
-        }
-        );
+      // Cuando cambia el país
+    this.miFormulario.get('pais')?.valueChanges
+    .pipe(
+      tap( () => {
+        this.miFormulario.get('frontera')?.reset('');
+        this.cargando = true;
+      }),
+      switchMap( codigo => this.paisesService.getPaisPorCodigo( codigo ) ),
+      switchMap( pais => this.paisesService.getPaisesPorCodigos( pais?.borders! ) )
+    )
+    .subscribe( paises => {
+      // this.fronteras = pais?.borders || [];
+      this.fronteras = paises;
+      this.cargando = false;
+    })
   }
 
   guardar(): void {
